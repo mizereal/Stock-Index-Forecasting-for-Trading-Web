@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block scripts %}
+<script type="text/javascript">
+  function SET100(value) {
+    var x = document.getElementById("choose-stock-price");
+    var y = document.getElementById("choose-stock-pct");
+    if (value === "Close Price"){
+       x.style.display = "block";
+       y.style.display = "none";
+    }
+    if (value === "Percent Change"){
+       y.style.display = "block";
+       x.style.display = "none";
+    }
+  } 
+</script>
+
+{% endblock scripts %}
+{% block content %}
+
+  <!-- navbar -->
+  <nav class="navbar navbar-inverse navbar-fixed-top">  
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#Navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+        </button>
+        <a class="navbar-brand" href="/home/">THESIS</a>
+      </div>
+      <div class="collapse navbar-collapse" id="Navbar">
+        <ul class="nav navbar-nav">
+          <li><a href="/home/">HOME</a></li>
+          <li class="active"><a href="/set100/">SET100</a></li>
+          <li><a href="/djia/">NYSE & NASDAQ</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- end navbar -->
+
+   <!-- start select market part -->
+  <div class="container" id="choose-y" style="margin-top: 60px;">
+    <h1 id="market-name">SET100</h1>
+    <p id="explain">select Y-axis data type for graph display</p>
+        <label class="radio-inline"><input type="radio" name="optradio" id="chkprict" onclick="SET100(this.value)" value="Close Price" checked>Close Price</label>
+        <label class="radio-inline"><input type="radio" name="optradio" id="chkpct" onclick="SET100(this.value)" value="Percent Change">%Change</label>
+      <br><br>
+  </div>
+  <!-- end select market part -->
+
+  <!-- choosing stock part -->
+  <div class="container" id="choose-stock-price" style="display: block;">
+    {% comment %} <h1 id="market-name">SET100</h1> {% endcomment %}
+    <p id="explain">select stock to analyse close price</p>
+    <br>
+    <div class="dropdown" style="width: 50%;">
+      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">select <span class="caret"></span></button>
+      <ul class="dropdown-menu">
+        <li><a href="/set100/price/ADVANC.BK">ADVANC</a></li>
+        <li><a href="/set100/price/AOT.BK">AOT</a></li>
+        <li><a href="/set100/price/BANPU.BK">BANPU</a></li>
+        <li><a href="/set100/price/BBL.BK">BBL</a></li>
+        <li><a href="/set100/price/BEM.BK">BEM</a></li>
+        <li><a href="/set100/price/BTS.BK">BTS</a></li>
+        <li><a href="/set100/price/CBG.BK">CBG</a></li>
+        <li><a href="/set100/price/CPALL.BK">CPALL</a></li>
+        <li><a href="/set100/price/CPN.BK">CPN</a></li>
+        <li><a href="/set100/price/LH.BK">LH</a></li>
+        <li><a href="/set100/price/MINT.BK">MINT</a></li>
+        <li><a href="/set100/price/OSP.BK">OSP</a></li>
+        <li><a href="/set100/price/PTT.BK">PTT</a></li>
+        <li><a href="/set100/price/SCB.BK">SCB</a></li>
+        <li><a href="/set100/price/TRUE.BK">TRUE</a></li>
+      </ul>
+    </div>
+  </div>
+  <!-- end choosing stock part -->
+
+    <!-- choosing stock part -->
+  <div class="container" id="choose-stock-pct" style="display: none;">
+    {% comment %} <h1 id="market-name">SET100</h1> {% endcomment %}
+    <p id="explain">select stock to analyse percent change</p>
+    <br>
+    <div class="dropdown" style="width: 50%;">
+      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">select <span class="caret"></span></button>
+      <ul class="dropdown-menu">
+        <li><a href="/set100/pctchange/ADVANC.BK">ADVANC</a></li>
+        <li><a href="/set100/pctchange/AOT.BK">AOT</a></li>
+        <li><a href="/set100/pctchange/BANPU.BK">BANPU</a></li>
+        <li><a href="/set100/pctchange/BBL.BK">BBL</a></li>
+        <li><a href="/set100/pctchange/BEM.BK">BEM</a></li>
+        <li><a href="/set100/pctchange/BTS.BK">BTS</a></li>
+        <li><a href="/set100/pctchange/CBG.BK">CBG</a></li>
+        <li><a href="/set100/pctchange/CPALL.BK">CPALL</a></li>
+        <li><a href="/set100/pctchange/CPN.BK">CPN</a></li>
+        <li><a href="/set100/pctchange/LH.BK">LH</a></li>
+        <li><a href="/set100/pctchange/MINT.BK">MINT</a></li>
+        <li><a href="/set100/pctchange/OSP.BK">OSP</a></li>
+        <li><a href="/set100/pctchange/PTT.BK">PTT</a></li>
+        <li><a href="/set100/pctchange/SCB.BK">SCB</a></li>
+        <li><a href="/set100/pctchange/TRUE.BK">TRUE</a></li>
+      </ul>
+    </div>
+  </div>
+  <!-- end choosing stock part -->
+
+    <br>
+    <br>
+  
+  <!-- analyse stock part -->
+  <div class="container" id="stock-data">
+    <!-- selected stock name -->
+    {% if stock %}
+      <h1 id="stock-name">{{stock}}</h1>
+    {% endif %}
+    {% if RMSE %}
+    <div class="row">
+      <div class="col-xs-4">
+        <h4>Root Mean Square Error : {{RMSE}}</h3>
+      </div>
+      <div class="col-xs-2">
+        <h4>R-Squared : {{EVS}}</h3> 
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- for graph -->
+    <div>
+    {% if chart %}
+        <img src="data:image/png;base64, {{chart|safe}}">
+    {% endif %}
+    </div>
+
+  </div>
+  <!-- end analyse stock part -->
+
+  <!-- footer -->
+  <div class="footer" style="position: sticky; padding-bottom: 10px;"></div>
+
+{% endblock content %}

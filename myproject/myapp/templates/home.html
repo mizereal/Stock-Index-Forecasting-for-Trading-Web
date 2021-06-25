@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block scripts %}
+{% endblock scripts %}
+{% block content %}
+
+    <!-- navbar -->
+  <nav class="navbar navbar-inverse navbar-fixed-top">  
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#Navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+        </button>
+        <a class="navbar-brand" href="/home/">THESIS</a>
+      </div>
+      <div class="collapse navbar-collapse" id="Navbar">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/home/">HOME</a></li>
+          <li><a href="/set100/">SET100</a></li>
+          <li><a href="/djia/">NYSE & NASDAQ</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- end navbar -->
+
+  <!-- start header -->
+  <div class="container" id="headband">
+    <div class="row">
+      <div class="col-md-6">
+        <h1 id="headingname" style="text-align:right;">STOCK INDEX FORECASTING FOR TRADING</h1>
+        <p id="explain" style="text-align:right;">please select the market</p>
+      </div>
+      <div class="col-md-6 media" id="visual">
+        {% load static %}
+        <img class="align-self-center mr-3" id="visual" src="{% static "visual_data.png" %}">
+      </div>
+    </div>
+  </div>
+  <!-- end header -->
+
+  <!-- start select market part -->
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-6">
+        <a href="/set100/" class="btn btn-default" role="button" id="market-button">SET100 <i class="fas fa-angle-right"></i></a>
+      </div>
+      <div class="col-xs-6">
+        <a href="/djia/" class="btn btn-default" role="button" id="market-button">NYSE & NASDAQ <i class="fas fa-angle-right"></i></a>    
+      </div>
+    </div>
+  </div>
+  <!-- end select market part -->
+
+  <!-- footer -->
+  <div class="footer"></div>
+
+{% endblock content %}

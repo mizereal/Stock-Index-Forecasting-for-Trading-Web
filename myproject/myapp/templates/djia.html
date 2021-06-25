@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block scripts %}
+<script type="text/javascript">
+  function DJIA(value) {
+    var x = document.getElementById("choose-stock-price");
+    var y = document.getElementById("choose-stock-pct");
+    if (value === "Close Price"){
+       x.style.display = "block";
+       y.style.display = "none";
+    }
+    if (value === "Percent Change"){
+       y.style.display = "block";
+       x.style.display = "none";
+    }
+  }
+</script>
+{% endblock scripts %}
+{% block content %}
+
+  <!-- navbar -->
+  <nav class="navbar navbar-inverse navbar-fixed-top">  
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#Navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+        </button>
+        <a class="navbar-brand" href="/home/">THESIS</a>
+      </div>
+      <div class="collapse navbar-collapse" id="Navbar">
+        <ul class="nav navbar-nav">
+          <li><a href="/home/">HOME</a></li>
+          <li><a href="/set100/">SET100</a></li>
+          <li class="active"><a href="/djia/">NYSE & NASDAQ</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- end navbar -->
+
+  <!-- start select market part -->
+  <div class="container" id="choose-y" style="margin-top: 60px;">
+    <h1 id="market-name">NYSE & NASDAQ</h1>
+    <p id="explain">select Y-axis data type for graph display</p>
+        <label class="radio-inline"><input type="radio" name="optradio" id="chkprict" onclick="DJIA(this.value)" value="Close Price" checked>Close Price</label>
+        <label class="radio-inline"><input type="radio" name="optradio" id="chkpct" onclick="DJIA(this.value)" value="Percent Change">%Change</label>
+      <br><br>
+  </div>
+  <!-- end select market part -->
+
+  <!-- choosing stock part -->
+  <div class="container" id="choose-stock-price" style="display: block;">
+    <p id="explain">select stock to analyse close price</p>
+    <br>
+    <div class="dropdown" style="width: 50%;">
+      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">select <span class="caret"></span></button>
+      <ul class="dropdown-menu">
+        <li><a href="/djia/price/AAPL">AAPL</a></li>
+        <li><a href="/djia/price/AMZN">AMZN</a></li>
+        <li><a href="/djia/price/CSCO">CSCO</a></li>
+        <li><a href="/djia/price/EBAY">EBAY</a></li>
+        <li><a href="/djia/price/FB">FB</a></li>
+        <li><a href="/djia/price/GOOG">GOOG</a></li>
+        <li><a href="/djia/price/INTC">INTC</a></li>
+        <li><a href="/djia/price/TSLA">TSLA</a></li>
+        <li><a href="/djia/price/MMM">MMM</a></li>
+        <li><a href="/djia/price/MSFT">MSFT</a></li>
+        <li><a href="/djia/price/NFLX">NFLX</a></li>
+        <li><a href="/djia/price/NKE">NKE</a></li>
+        <li><a href="/djia/price/NVDA">NVDA</a></li>
+        <li><a href="/djia/price/ORCL">ORCL</a></li>
+        <li><a href="/djia/price/WMT">WMT</a></li>
+      </ul>
+    </div>
+  </div>
+  <!-- end choosing stock part -->
+
+  <!-- choosing stock part -->
+  <div class="container" id="choose-stock-pct" style="display: none;">
+    <p id="explain">select stock to analyse percent change</p>
+    <br>
+    <div class="dropdown" style="width: 50%;">
+      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">select <span class="caret"></span></button>
+      <ul class="dropdown-menu">
+        <li><a href="/djia/pctchange/AAPL">AAPL</a></li>
+        <li><a href="/djia/pctchange/AMZN">AMZN</a></li>
+        <li><a href="/djia/pctchange/CSCO">CSCO</a></li>
+        <li><a href="/djia/pctchange/EBAY">EBAY</a></li>
+        <li><a href="/djia/pctchange/FB">FB</a></li>
+        <li><a href="/djia/pctchange/GOOG">GOOG</a></li>
+        <li><a href="/djia/pctchange/INTC">INTC</a></li>
+        <li><a href="/djia/pctchange/TSLA">TSLA</a></li>
+        <li><a href="/djia/pctchange/MMM">MMM</a></li>
+        <li><a href="/djia/pctchange/MSFT">MSFT</a></li>
+        <li><a href="/djia/pctchange/NFLX">NFLX</a></li>
+        <li><a href="/djia/pctchange/NKE">NKE</a></li>
+        <li><a href="/djia/pctchange/NVDA">NVDA</a></li>
+        <li><a href="/djia/pctchange/ORCL">ORCL</a></li>
+        <li><a href="/djia/pctchange/WMT">WMT</a></li>
+      </ul>
+    </div>
+  </div>
+  <!-- end choosing stock part -->
+  
+    <br>
+    <br>
+  
+  <!-- analyse stock part -->
+  <div class="container" id="stock-data">
+    <!-- selected stock name -->
+        {% if stock %}
+          <h1 id="stock-name">{{stock}}</h1>
+        {% endif %}
+    {% if RMSE %}
+    <div class="row">
+      <div class="col-xs-4">
+        <h4>Root Mean Square Error : {{RMSE}}</h3>
+      </div>
+      <div class="col-xs-2">
+        <h4>R-Squared : {{EVS}}</h3> 
+      </div>
+    </div>
+    {% endif %}
+    <!-- for graph -->
+    <div>
+    {% if chart %}
+        <img src="data:image/png;base64, {{chart|safe}}">
+    {% endif %}
+    </div>
+
+  </div>
+  <!-- end analyse stock part -->
+
+  <!-- footer -->
+  <div class="footer" style="position: sticky; padding-bottom: 10px;"></div>
+
+{% endblock content %}

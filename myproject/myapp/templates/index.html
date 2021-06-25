@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+
+{% endblock scripts %}
+
+{% block content %}
+    Hello World!!!<p>Stock is {{stock}}</p>
+    {% comment %} {% if chart %}
+        <img src="data:image/png;base64, {{chart|safe}}">
+    {% endif %} {% endcomment %}
+    
+    {% comment %} xx {{xxxx}} {% endcomment %}
+
+    <p>
+         {% for k in k_feature_names %}
+            {{k}}
+    </p>
+    {% endfor %}
+    
+{% endblock content %}
