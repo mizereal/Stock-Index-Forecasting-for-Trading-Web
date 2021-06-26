@@ -11,3 +11,6 @@ myproject --> myapp -->
 --> templates เก็บบันทึกไฟล์ html
 --> static เก็บบันทึกไฟล์ css javascripts
 --> weights เก็บบันทึกไฟล์โมเดล
+
+# Folder --> myproject --> myapp --> requirements.txt
+python library สําหรับติดตั้งที่ใช้ในโปรเจคนี้
