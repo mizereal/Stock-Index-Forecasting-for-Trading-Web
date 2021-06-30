@@ -115,26 +115,38 @@
     {% if stock %}
       <h1 id="stock-name">{{stock}}</h1>
     {% endif %}
-    {% if RMSE %}
-    <div class="row">
-      <div class="col-xs-4">
-        <h4>Root Mean Square Error : {{RMSE}}</h3>
-      </div>
-      <div class="col-xs-2">
-        <h4>R-Squared : {{EVS}}</h3> 
-      </div>
-    </div>
-    {% endif %}
-
     <!-- for graph -->
     <div>
     {% if chart %}
         <img src="data:image/png;base64, {{chart|safe}}">
     {% endif %}
     </div>
-
   </div>
   <!-- end analyse stock part -->
+  {% if d %} 
+  <div class="container">
+  <h2 class="text-center"><u>Evaluation Table</u></h2><br>            
+  <table class="table table-dark table-striped">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Root Mean Square Error</th>
+        <th>R-Squared</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- jinja2 Technique --> 
+    {% for i in d %}
+      <tr>
+        <td>{{i.Model}}</td>
+        <td>{{i.RMSE}}</td>
+        <td>{{i.EVS}}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
 
   <!-- footer -->
   <div class="footer" style="position: sticky; padding-bottom: 10px;"></div>
