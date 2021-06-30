@@ -4,11 +4,13 @@ from django.http import HttpResponse
 from .predictor import Predictor
 from .preprocessstock import preprocess
 from .plot import get_plot
-from .pathTA import pathTA
+from .pathModel import pathModel
+from .runModel import runModel
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 import math
+import json
 from datetime import date, timedelta
 from sklearn.metrics import explained_variance_score
 from sklearn.metrics import mean_squared_error  as MSE
@@ -32,200 +34,120 @@ def djia(request):
 
 def djiastock(request, stock_n):
     gpu
-    model_n = 'tdnn'
-    model = Predictor(model_n, 32)
     stock = "%s"%stock_n
-    todate, x, y, max, min = model.load_transform(stock)
+    model_n = 'tdnn'
+    actual, trend_tdnn, predict_tdnn, dateList, todate, todate_p_tdnn, df_tndd = runModel(model_n, stock)
+
+    model_n = 'tdnn_pso'
+    actual, trend_tdnn_pso, predict_tdnn_pso, dateList, todate, todate_p_tdnn_pso, df_tdnn_pso = runModel(model_n, stock)
+
+    model_n = 'rf'
+    actual, trend_rf, predict_rf, dateList, todate, todate_p_rf, df_rf = runModel(model_n, stock)
     
-    pred = model.predict(x)
-
-    pred = pred.reshape(1,-1)[0]
-    for i in range(0, len(pred)):
-        pred[i] = (pred[i]*(max-min))+min
-
-    y = y.reshape(1,-1)[0]
-    for i in range(0, len(y)):
-        y[i] = (y[i]*(max-min))+min 
+    model_n = 'svm'
+    actual, trend_svm, predict_svm, dateList, todate, todate_p_svm, df_svm = runModel(model_n, stock)
     
-    y = y[~np.isnan(y)]
-
-    pred_tset = pred[0:-7]
-
-    RMSE =round(math.sqrt(MSE(y, pred_tset)), 4)
-    EVS = round(explained_variance_score(y, pred_tset), 4)
-
-    yy = y[-28:]
-
-    yyy = pred[-35:]
-
-    a = date.today()
-
-    dateList = []
-    for i in range (0, 7):
-        d = a + timedelta(days = i)
-        d = d.strftime("%d%b")
-        dateList.append(d)
-
-    todate = todate.apply(lambda x: x.strftime('%d%b'))
-    todate = todate.values.tolist()
-    todate = todate[-28:]
-    dateList_2 = todate[-28:]
-
-    for dlist in dateList:
-        dateList_2.append(dlist)
+    df = pd.DataFrame(columns=list(['Model', 'RMSE', 'EVS']))
+    df = df.append(df_tndd)
+    df = df.append(df_tdnn_pso)
+    df = df.append(df_rf)
+    df = df.append(df_svm)
+    json_records = df.reset_index().to_json(orient ='records')
+    data = []
+    data = json.loads(json_records)
 
     labely = "Price"
 
-    chart = get_plot(labely, todate, yy, dateList_2, yyy)
-    return render(request, 'djia.html', {"chart": chart, "stock": stock, "RMSE": RMSE, "EVS": EVS})
+    chart = get_plot(labely, todate, actual, todate_p_tdnn, trend_tdnn, dateList, predict_tdnn, todate_p_tdnn_pso, trend_tdnn_pso, 
+    dateList, predict_tdnn_pso, todate_p_rf, trend_rf, dateList, predict_rf, todate_p_svm, trend_svm, dateList, predict_svm)
+    return render(request, 'djia.html', {"chart": chart, "stock": stock, 'd': data})
 
 def djiastockpct(request, stock_n):
     gpu
-    model_n = 'tdnn'
-    model = Predictor(model_n, 32)
     stock = "%s"%stock_n
-    todate, x, y, max, min = model.load_transform(stock)
+    model_n = 'tdnn'
+    actual, trend_tdnn, predict_tdnn, dateList, todate, todate_p_tdnn, df_tndd = runModel(model_n, stock, type_y=False)
+
+    model_n = 'tdnn_pso'
+    actual, trend_tdnn_pso, predict_tdnn_pso, dateList, todate, todate_p_tdnn_pso, df_tdnn_pso = runModel(model_n, stock, type_y=False)
+
+    model_n = 'rf'
+    actual, trend_rf, predict_rf, dateList, todate, todate_p_rf, df_rf = runModel(model_n, stock, type_y=False)
     
-    pred = model.predict(x)
-
-    pred = pred.reshape(1,-1)[0]
-    for i in range(0, len(pred)):
-        pred[i] = (pred[i]*(max-min))+min
-
-    y = y.reshape(1,-1)[0]
-    for i in range(0, len(y)):
-        y[i] = (y[i]*(max-min))+min
-
-    y = y[~np.isnan(y)]
-
-    pred_tset = pred[0:-7]
-
-    RMSE =round(math.sqrt(MSE(y, pred_tset)), 4)
-    EVS = round(explained_variance_score(y, pred_tset), 4) 
-
-    yy = y[-28:]
-    yyy = pred[-35:]
-   
-    yy = np.diff(yy) / yy[1:] * 100
-    yyy = np.diff(yyy) / yyy[1:] * 100
-
-    a = date.today()
-
-    dateList = []
-    for i in range (0, 7):
-        d = a + timedelta(days = i)
-        d = d.strftime("%d%b")
-        dateList.append(d)
-
-    todate = todate.apply(lambda x: x.strftime('%d%b'))
-    todate = todate.values.tolist()
-    todate = todate[-27:]
-    dateList_2 = todate[-27:]
-
-    for dlist in dateList:
-        dateList_2.append(dlist)
+    model_n = 'svm'
+    actual, trend_svm, predict_svm, dateList, todate, todate_p_svm, df_svm = runModel(model_n, stock, type_y=False)
+    
+    df = pd.DataFrame(columns=list(['Model', 'RMSE', 'EVS']))
+    df = df.append(df_tndd)
+    df = df.append(df_tdnn_pso)
+    df = df.append(df_rf)
+    df = df.append(df_svm)
+    json_records = df.reset_index().to_json(orient ='records')
+    data = []
+    data = json.loads(json_records)
 
     labely = "%Change"
 
-    chart = get_plot(labely, todate, yy, dateList_2, yyy)
-    return render(request, 'djia.html', {"chart": chart, "stock": stock, "RMSE": RMSE, "EVS": EVS})
+    chart = get_plot(labely, todate, actual, todate_p_tdnn, trend_tdnn, dateList, predict_tdnn, todate_p_tdnn_pso, trend_tdnn_pso, 
+    dateList, predict_tdnn_pso, todate_p_rf, trend_rf, dateList, predict_rf, todate_p_svm, trend_svm, dateList, predict_svm)
+    return render(request, 'djia.html', {"chart": chart, "stock": stock, 'd': data})
 
 def setstock(request, stock_n):
     gpu
-    model_n = 'tdnn'
-    model = Predictor(model_n, 32)
     stock = "%s"%stock_n
-    todate, x, y, max, min = model.load_transform(stock)
+    model_n = 'tdnn'
+    actual, trend_tdnn, predict_tdnn, dateList, todate, todate_p_tdnn, df_tndd = runModel(model_n, stock)
+
+    model_n = 'tdnn_pso'
+    actual, trend_tdnn_pso, predict_tdnn_pso, dateList, todate, todate_p_tdnn_pso, df_tdnn_pso = runModel(model_n, stock)
+
+    model_n = 'rf'
+    actual, trend_rf, predict_rf, dateList, todate, todate_p_rf, df_rf = runModel(model_n, stock)
     
-    pred = model.predict(x)
-
-    pred = pred.reshape(1,-1)[0]
-    for i in range(0, len(pred)):
-        pred[i] = (pred[i]*(max-min))+min
-
-    y = y.reshape(1,-1)[0]
-    for i in range(0, len(y)):
-        y[i] = (y[i]*(max-min))+min 
+    model_n = 'svm'
+    actual, trend_svm, predict_svm, dateList, todate, todate_p_svm, df_svm = runModel(model_n, stock)
     
-    y = y[~np.isnan(y)]
+    df = pd.DataFrame(columns=list(['Model', 'RMSE', 'EVS']))
+    df = df.append(df_tndd)
+    df = df.append(df_tdnn_pso)
+    df = df.append(df_rf)
+    df = df.append(df_svm)
+    json_records = df.reset_index().to_json(orient ='records')
+    data = []
+    data = json.loads(json_records)
 
-    pred_tset = pred[0:-7]
-
-    RMSE =round(math.sqrt(MSE(y, pred_tset)), 4)
-    EVS = round(explained_variance_score(y, pred_tset), 4) 
-
-    yy = y[-28:]
-
-    yyy = pred[-35:]
-
-    a = date.today()
-
-    dateList = []
-    for i in range (0, 7):
-        d = a + timedelta(days = i)
-        d = d.strftime("%d%b")
-        dateList.append(d)
-
-    todate = todate.apply(lambda x: x.strftime('%d%b'))
-    todate = todate.values.tolist()
-    todate = todate[-28:]
-    dateList_2 = todate[-28:]
-
-    for dlist in dateList:
-        dateList_2.append(dlist)
-    
     labely = "Price"
 
-    chart = get_plot(labely, todate, yy, dateList_2, yyy)
-    return render(request, 'set100.html', {"chart": chart, "stock": stock, "RMSE": RMSE, "EVS": EVS})
+    chart = get_plot(labely, todate, actual, todate_p_tdnn, trend_tdnn, dateList, predict_tdnn, todate_p_tdnn_pso, trend_tdnn_pso, 
+    dateList, predict_tdnn_pso, todate_p_rf, trend_rf, dateList, predict_rf, todate_p_svm, trend_svm, dateList, predict_svm)
+    return render(request, 'set100.html', {"chart": chart, "stock": stock, 'd': data})
 
 def setstockpct(request, stock_n):
     gpu
-    model_n = 'tdnn'
-    model = Predictor(model_n, 32)
     stock = "%s"%stock_n
-    todate, x, y, max, min = model.load_transform(stock)
+    model_n = 'tdnn'
+    actual, trend_tdnn, predict_tdnn, dateList, todate, todate_p_tdnn, df_tndd = runModel(model_n, stock, type_y=False)
+
+    model_n = 'tdnn_pso'
+    actual, trend_tdnn_pso, predict_tdnn_pso, dateList, todate, todate_p_tdnn_pso, df_tdnn_pso = runModel(model_n, stock, type_y=False)
+
+    model_n = 'rf'
+    actual, trend_rf, predict_rf, dateList, todate, todate_p_rf, df_rf = runModel(model_n, stock, type_y=False)
     
-    pred = model.predict(x)
+    model_n = 'svm'
+    actual, trend_svm, predict_svm, dateList, todate, todate_p_svm, df_svm = runModel(model_n, stock, type_y=False)
+    
+    df = pd.DataFrame(columns=list(['Model', 'RMSE', 'EVS']))
+    df = df.append(df_tndd)
+    df = df.append(df_tdnn_pso)
+    df = df.append(df_rf)
+    df = df.append(df_svm)
+    json_records = df.reset_index().to_json(orient ='records')
+    data = []
+    data = json.loads(json_records)
 
-    pred = pred.reshape(1,-1)[0]
-    for i in range(0, len(pred)):
-        pred[i] = (pred[i]*(max-min))+min
+    labely = "%Change"
 
-    y = y.reshape(1,-1)[0]
-    for i in range(0, len(y)):
-        y[i] = (y[i]*(max-min))+min 
-
-    y = y[~np.isnan(y)]
-
-    pred_tset = pred[0:-7]
-
-    RMSE =round(math.sqrt(MSE(y, pred_tset)), 4)
-    EVS = round(explained_variance_score(y, pred_tset), 4) 
-
-    yy = y[-28:]
-    yyy = pred[-35:]
-   
-    yy = np.diff(yy) / yy[1:] * 100
-    yyy = np.diff(yyy) / yyy[1:] * 100
-
-    a = date.today()
-
-    dateList = []
-    for i in range (0, 7):
-        d = a + timedelta(days = i)
-        d = d.strftime("%d%b")
-        dateList.append(d)
-
-    todate = todate.apply(lambda x: x.strftime('%d%b'))
-    todate = todate.values.tolist()
-    todate = todate[-27:]
-    dateList_2 = todate[-27:]
-
-    for dlist in dateList:
-        dateList_2.append(dlist)
-
-    labely = "Percent Change"
-
-    chart = get_plot(labely, todate, yy, dateList_2, yyy)
-    return render(request, 'set100.html', {"chart": chart, "stock": stock, "RMSE": RMSE, "EVS": EVS})
+    chart = get_plot(labely, todate, actual, todate_p_tdnn, trend_tdnn, dateList, predict_tdnn, todate_p_tdnn_pso, trend_tdnn_pso, 
+    dateList, predict_tdnn_pso, todate_p_rf, trend_rf, dateList, predict_rf, todate_p_svm, trend_svm, dateList, predict_svm)
+    return render(request, 'set100.html', {"chart": chart, "stock": stock, 'd': data})
