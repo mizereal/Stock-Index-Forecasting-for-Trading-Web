@@ -13,6 +13,7 @@ class Predictor():
             }
         self.batch_size = batch_size
         self.model_type = model_type
+        self.model = None
         self.x = None
         self.y = None
         self.max = None
@@ -34,7 +35,7 @@ class Predictor():
         self.x = np.expand_dims(self.x, axis=1)
         self.x = np.expand_dims(self.x, axis=-1)
         return self.today, self.x, self.y, self.max, self.min
-# .astype('float32')
+
     def predict(self, data=None):
         if data is None:
             if self.x is None:
@@ -48,7 +49,7 @@ class Predictor():
                 pred = self.model.predict(data)
                 pred = extract_from_batch(pred, og_n_samples)
             else:
-                data = data.reshape(data.shape[0], 7).astype('float32')
+                data = data.reshape(data.shape[0], 35).astype('float32')
                 pred = self.model.predict(data)
         except Exception as e:
             print(f'Error while prediction {e}')
